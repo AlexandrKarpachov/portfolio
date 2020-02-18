@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<title>Личный кабинет</title>
+<script type="text/javascript">
+var cars;
+function getUser(func) {
+	$.ajax("./ajax", {
+		method : "get",
+		data : {
+			"query" : "user"
+		},
+		success : function(data) {
+			func(data);
+		}
+	});
+}
+
+function fillPage() {
+	getUser(function(user) {
+		cars = user.cars;
+		var table = document.getElementById("car-table");
+		fillCarTable();
+		$("#userData").html(fillUserData(user));
+	});
+}
+
+function fillUserData(user) {
+	var cars = 0;
+	for (var i = 0; i < user.cars.length; i++) {
+		if (user.cars[i].active) {
+			cars++;
+		}
+	}
+	return '<p><span>' + user.name + '</span><br>'
+		+ '<span>' + user.surname + '</span></p>'
+		+ '<p>Автомобилей выставлено ' + cars + '</p>'
+		
+}
+
+function sellCar(id) {
+	$.ajax("./ajax", {
+		method : "get",
+		data : {
+			"query" : "sell",
+			"carId" : id
+		},
+		success : function(data) {
+			fillPage();
+		}
+	});
+}
+
+function fillCarTable() {
+	var result = "";
+	var sale;
+	var color;
+	
+	for (var i = 0; i < cars.length; i++) {
+		var c = $("#only-active").prop("checked") && !cars[i].active;
+		if ($("#only-active").prop("checked") && !cars[i].active) {
+			continue;
+		}
+		var image = typeof cars[i].images[0] === 'undefined' ? 'default.png' : cars[i].images[0];
+		if (cars[i].active === true) {
+			sale = '<button type="button" onclick="sellCar(' + cars[i].id + ')" class="btn btn-danger btn-lg">Продать</button>'
+			color = 'primary';
+		} else {
+			sale = '<h4><font color="red">Продано!</font></h4>';
+			color = 'secondary';
+		}
+		
+		
+		result += '<tr class="table-' + color + '"><th rowspan="2" class="w-25"><a href="car_view.html?id=' + cars[i].id + '"><img src="upload/' 
+				+  image + '" alt="Нет Фото" width="240" height="160"></a></th>\n'
+			+ '<th colspan="2"><h5><a href="car_view.html?id=' + cars[i].id + '">' + cars[i].brand + ' ' + cars[i].model +'</a></h5></th>'
+			+ '<th rowspan="2" class="align-middle text-center">' + sale + '</th></tr>'
+			+ '<tr class="table-' + color + '"><th class="w-25"> Цена:' + cars[i].price + '<br>' 
+			+ 'Год: ' + cars[i].year + '<br>'
+			+ 'Тип кузова: ' + cars[i].body.type + '</th>'
+			+ '<th class="w-25"> Двигатель: ' + cars[i].engine.volume + ' ' + cars[i].engine.type.value + '<br>'
+			+ ' КПП: ' + cars[i].shiftGear.value + '</th></tr>';
+	}
+	$("#car-table").html(result);
+}
+
+function logout() {
+	$.ajax("./ajax", {
+		method : "POST",
+		data : {
+			"query" : "logout",
+		},
+		success : function(data) {
+			window.location = "main.html";
+		}
+	});
+}
+
+
+window.onload = function() {
+	fillPage();
+}
+</script>
+<style>
+.navbar {
+	margin-bottom: 5px;
+}
+</style>
+</head>
+<body>
+	<div class="container">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-info rounded" >
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="main.html">Главная: </a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="add_car.html">Добавить автомобиль</a>
+				</li>
+			</ul>
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item active hidden"  id="exit">
+					<a class="nav-link" onclick="logout()" href="#" >Выход</a>
+				</li>
+			</ul>
+	</nav>
+		<div class="row">
+			<!-- --------- info --------------- -->
+			<aside class="col-sm-3">
+				<div class="card">
+					<article class="card-group-item">
+						<header class="card-header">
+							<h6 class="title">Информация:</h6>
+						</header>
+						<div class="filter-content">
+							<div class="card-body">
+									<div class="form-group form-check">
+										<label class="form-check-label"> 
+											<input class="form-check-input" onclick="fillCarTable()" type="checkbox" id="only-active">
+											Только Активные
+										</label>
+									</div>
+									<div class="form-group" id="userData">
+										
+									</div>
+							</div>
+						</div>
+					</article>
+				</div>
+			</aside><!-- -------------  //info.  ---------------------->
+			
+			<!-- -------------  Car Table  ---------------------->
+			<div class="col-sm-9">
+				<table class="table">
+					<tbody class="car table" id="car-table">
+
+					</tbody>
+				</table>
+			</div>
+		</div> <!-- //row -->
+	</div>
+</body>
+</html>

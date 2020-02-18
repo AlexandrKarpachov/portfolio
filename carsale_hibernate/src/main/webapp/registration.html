@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<title>Registration</title>
+<script type="text/javascript">
+
+	function tryRegister() {
+		var login = $('#login').val();
+		var name = $('#name').val();
+		var surname = $('#surname').val();
+		var phone = $('#phone').val();
+		var password = 	$('#pwd').val();
+		
+	  	if (validate()) {
+	  		$.ajax("./ajax", {
+		        method : "post",
+		        data : {
+		        		"query"    : "register",
+		        		"name"	   : name,
+		        		"surname"  : surname,
+		        		"phone"    : phone,
+		        		"login"    : login,
+		        		"password" : password
+		        		},
+		        success : function(data) {
+		        	if (data === false) {
+		        		alert("Такой логин уже существует")
+		        		return false;
+		        	} else {
+		        		window.location = "signIn.html";
+		        	}
+
+		        }
+		    });
+	  	}
+	}
+	
+	function validate() {
+		var login = $('#login').val();
+		var name = $('#name').val();
+		var surname = $('#surname').val();
+		var phone = $('#phone').val();
+		var password = 	$('#pwd').val();
+		var passRepeat = $('#dpwd').val();
+		var result = true;
+		if (login === '') {
+			alert("заполните логин");
+			result = false;
+		}
+		if (name === '') {
+		var passRepeat = $('#dpwd');
+			alert("заполните имя");
+			result = false;
+		}
+		if (surname === '') {
+			alert("заполните фамилию");
+			result = false;
+		}
+		if (phone === '') {
+			alert("заполните телефон");
+			result = false;
+		}
+		if (password === '' || passRepeat === '') {
+			alert("заполните пароль");
+			result = false;
+		} else if (password != passRepeat) {
+			alert("Пароли должны совпадать")
+			result = false;
+		}
+		return result;
+	}
+</script>
+</head>
+<body>
+	<div class="container">
+		<form onsubmit="checkPassword()">
+			<h2>Регистрация :</h2>
+			<div class="form-group">
+				<label for="usr">Логин:</label> <input type="text"
+					class="form-control" id="login" name="login">
+			</div>
+			<div class="form-group">
+				<label for="name">Имя:</label> <input type="text"
+					class="form-control" id="name" name="name">
+			</div>
+			<div class="form-group">
+				<label for="surname">Фамилия:</label> <input type="text"
+					class="form-control" id="surname" name="surname">
+			</div>
+			<div class="form-group">
+				<label for="phone">Телефон:</label> <input type="text"
+					class="form-control" id="phone" name="phone">
+			</div>
+			<div class="form-group">
+				<label for="pwd">Password:</label> <input type="password"
+					class="form-control" id="pwd" name="pwd">
+			</div>
+			<div class="form-group">
+				<label for="dpwd">Password:</label> <input type="password"
+					class="form-control" id="dpwd">
+			</div>
+			<button type="button" class="btn btn-success" onclick="tryRegister()">Регистрация</button>
+		</form>
+	</div>
+</body>
+</html>

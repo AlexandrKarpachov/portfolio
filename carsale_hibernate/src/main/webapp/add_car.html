@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<script>
+	function fillYearsSelect() {
+
+		$.ajax("./ajax", {
+			method : "get",
+			data : {
+				query : "years"
+			},
+			success : function(data) {
+				for (var i = 0; i < data.length; i++) {
+					$('#year').append('<option>' + data[i] + '</option>\n');
+				}
+			}
+		});
+	}
+
+	function addUploadField(index) {
+		var next = index + 1;
+		$('#images').append(
+				'<input type="file" class="form-control-file border"'
+						+ 'name="file' + index + '" onchange="addUploadField('
+						+ next + ')">');
+	}
+
+	function fillMarkSelect() {
+		$.ajax("./ajax", {
+			method : "get",
+			data : {
+				query : "brands"
+			},
+			success : function(data) {
+				var result = "";
+				result += "<option>none</option>\n"
+				for (var i = 0; i < data.length; i++) {
+					result += '<option id="' + data[i].id + '">' + data[i].name
+							+ "</option>"
+				}
+				var select = document.getElementById("brands");
+				select.innerHTML = result;
+			}
+		});
+	}
+
+	function fillModelSelect() {
+		var result = "<option>none</option>";
+		var markId = $("#brands :selected").attr("id");
+		var select = document.getElementById("models");
+		select.innerHTML = result;
+		if (markId != "none") {
+			$.ajax("./ajax", {
+				method : "get",
+				data : {
+					"query" : "models",
+					"brandId" : markId
+				},
+				success : function(models) {
+					for (var i = 0; i < models.length; i++) {
+						result += '<option>' + models[i].name + "</option>\n"
+					}
+					select.innerHTML = result;
+				}
+			});
+		}
+	}
+
+	function fillEngineSelect() {
+		var result = "<option>none</option>";
+		var select = document.getElementById("fuel");
+		select.innerHTML = result;
+		$.ajax("./ajax", {
+			method : "get",
+			data : {
+				"query" : "engines",
+			},
+			success : function(data) {
+				for (var i = 0; i < data.length; i++) {
+					result += '<option value="' + data[i].name + '">'
+							+ data[i].value + "</option>\n"
+				}
+				select.innerHTML = result;
+			}
+		});
+	}
+
+	function fillShiftGearSelect() {
+		var result = "<option>none</option>";
+		var select = document.getElementById("shiftGear");
+		select.innerHTML = result;
+		$.ajax("./ajax", {
+			method : "get",
+			data : {
+				"query" : "shiftGears",
+			},
+			success : function(data) {
+				for (var i = 0; i < data.length; i++) {
+					result += '<option  value="' + data[i].name + '">'
+							+ data[i].value + "</option>\n"
+				}
+				select.innerHTML = result;
+			}
+		});
+	}
+
+	function validate() {
+		var brand = $("#brands :selected").val();
+		var model = $("#models :selected").val();
+		var year = $("#year :selected").val();
+		var engine = $("#fuel :selected").val();
+		var shiftGear = $("#shiftGear :selected").val();
+		var price = $("#price").val();
+		var volume = $("#volume").val();
+		var body = $("#body").val();
+
+		var result = true;
+		if (brand === "none") {
+			alert("Выбирите марку");
+			result = false;
+		}
+
+		if (model === "none") {
+			alert("Выбирите модель");
+			result = false;
+		}
+
+		if (year === "none") {
+			alert("Выбирите год");
+			result = false;
+		}
+
+		if (engine === "none") {
+			alert("Выбирите топливо");
+			result = false;
+		}
+
+		if (shiftGear === "none") {
+			alert("Выбирите коробку передач");
+			result = false;
+		}
+
+		if (price === "") {
+			alert("Введите цену");
+			result = false;
+		} else if (Math.sign(price) != 1) {
+			alert("Цена не может быть отрицательной")
+		}
+
+		if (volume === "") {
+			alert("Введите объем");
+			result = false;
+		} else if (Math.sign(volume) != 1) {
+			alert("Объем не может быть отрицательным")
+		}
+
+		return result;
+	}
+
+	function getUserId() {
+		$.ajax("./ajax", {
+			method : "get",
+			data : {
+				"query" : "userId",
+			},
+			success : function(data) {
+				$('#userId').val(data);
+			}
+		});
+	}
+
+	function logout() {
+		$.ajax("./ajax", {
+			method : "POST",
+			data : {
+				"query" : "logout",
+			},
+			success : function(data) {
+				window.location = "main.html";
+				return true;
+			}
+		});
+	}
+	
+	window.onload = function() {
+		fillYearsSelect();
+		fillMarkSelect();
+		fillShiftGearSelect();
+		fillEngineSelect();
+		getUserId();
+	}
+</script>
+</head>
+<body>
+
+	<div class="container">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-info rounded" >
+		
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link" href="main.html">Главная</a>
+				</li>
+				<li class="nav-item active">
+					<a class="nav-link" href="user.html">Личный кабинет</a>
+				</li>
+			</ul>
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item active"  id="exit">
+					<a class="nav-link" onclick="logout()" href="#" >Выход</a>
+				</li>
+			</ul>
+		</nav>
+		<form action="upload" method="post" enctype="multipart/form-data"
+			onsubmit="return validate()">
+			<input type="hidden" class="form-control" id="userId" name="userId">
+			<div class="row">
+				<div class="form-group col">
+					<label for="brands">Марка :</label> <select class="form-control"
+						id="brands" name="brand" onchange="fillModelSelect()">
+
+					</select>
+				</div>
+				<div class="form-group col">
+					<label for="brand">Модель :</label> <select class="form-control"
+						id="models" name="model">
+						<option>none</option>
+					</select>
+				</div>
+				<div class="form-group col">
+					<label>Год: </label>
+					<div class="form-inline">
+						<div class="minYear">
+							<select class="form-control" id="year" name="year">
+								<option>none</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="form-group col">
+					<label for="brand">Топливо :</label> <select class="form-control"
+						id="fuel" name="fuel"></select>
+				</div>
+				<div class="form-group col">
+					<label>Объем: </label>
+					<div class="form-inline">
+						<div class="valume">
+							<input type="number" step="0.1" class="form-control" id="volume"
+								name="volume" placeholder="Объем">
+						</div>
+					</div>
+				</div>
+				<div class="form-group col">
+					<label>Мощность: </label>
+					<div class="form-inline">
+						<div class="power">
+							<input type="number" step="1" class="form-control" id="power"
+								name="power" placeholder="0" required>
+						</div>
+					</div>
+				</div>
+				<div class="form-group col"></div>
+			</div>
+
+			<div class="row">
+				<div class="form-group col">
+					<label>Тип кузова: </label>
+					<div class="form-inline">
+						<div class="body">
+							<input type="text" class="form-control" id="body" name="body"
+								placeholder="" required>
+						</div>
+					</div>
+				</div>
+				<div class="form-group col">
+					<label for="brand">Коробка передач :</label> <select
+						class="form-control" id="shiftGear" name="shiftGear"></select>
+				</div>
+				<div class="form-group col"></div>
+
+			</div>
+			<div class="form-group">
+				<label>Цена: </label>
+				<div class="form-inline">
+					<div class="price">
+						<input type="number" class="form-control" id="price" name="price"
+							placeholder="цена">
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="desc">Описание:</label>
+				<textarea class="form-control" rows="4" name="desc" maxlength="1000"></textarea>
+			</div>
+			<div class="form-group" id="images">
+				<input type="file" class="form-control-file border" name="file"
+					onchange="addUploadField(1)">
+			</div>
+			<button type="submit" class="btn btn-success" onclick="">Success
+			</button>
+		</form>
+	</div>
+</body>
+</html>

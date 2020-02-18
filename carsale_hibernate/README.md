@@ -13,4 +13,4 @@ Cоздать приложение удовлетворющее свойства
 <h3>Общий вид</h3>
 <img src="screenshot3.png">
 <h3>Поиск</h3>
-<img src="screenshot4.jpg">
+<img src="screenshot4.png">

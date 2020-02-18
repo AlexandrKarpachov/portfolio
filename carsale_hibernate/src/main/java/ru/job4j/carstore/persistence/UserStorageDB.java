@@ -2,7 +2,9 @@ package ru.job4j.carstore.persistence;
 
 import java.util.function.Function;
 
-import org.apache.log4j.Logger;
+
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -15,7 +17,7 @@ import ru.job4j.carstore.persistence.interfaces.IUserStorage;
 public class UserStorageDB implements IUserStorage {
 	private static final UserStorageDB INSTANCE = new UserStorageDB();
 	private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
-	private final static Logger LOG = Logger.getLogger(UserStorageDB.class.getName());
+	private final static Logger LOG = LoggerFactory.getLogger(UserStorageDB.class);
 
 	private UserStorageDB() {
 	}

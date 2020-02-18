@@ -11,7 +11,9 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.apache.log4j.Logger;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -26,7 +28,7 @@ import ru.job4j.carstore.persistence.interfaces.ICarStorege;
 public class CarStoreageDB implements ICarStorege {
 	private static final CarStoreageDB INSTANCE = new CarStoreageDB();
 	private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
-	private final static Logger LOG = Logger.getLogger(CarStoreageDB.class.getName());
+	private final static Logger LOG = LoggerFactory.getLogger(CarStoreageDB.class);
 	private CarStoreageDB() {
 	}
 	

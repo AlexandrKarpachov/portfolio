@@ -5,7 +5,9 @@ import java.util.function.Function;
 
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
+
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,7 +20,7 @@ import ru.job4j.carstore.persistence.interfaces.IBrandStorage;
 public class BrandStorage implements IBrandStorage {
 	private final static BrandStorage INSTANCE = new BrandStorage();
 	private final SessionFactory factory = new Configuration().configure().buildSessionFactory();
-	private final static Logger LOG = Logger.getLogger(CarStoreageDB.class.getName());
+	private final static Logger LOG = LoggerFactory.getLogger(CarStoreageDB.class);
 	private BrandStorage() {
 	}
 
@@ -28,7 +30,7 @@ public class BrandStorage implements IBrandStorage {
 	
 	@Override
 	public void addBrand(Brand brand) {
-		tx(session -> session.save(brand));
+		tx(session -> session.save(brand), "Can't add brand = " + brand.toString());
 	}
 
 	@Override
@@ -36,7 +38,7 @@ public class BrandStorage implements IBrandStorage {
 		tx(session -> {
 			session.update(brand);
 			return true;
-		});
+		}, "Can't update brand =" + brand.toString());
 	}
 
 	@Override
@@ -44,13 +46,14 @@ public class BrandStorage implements IBrandStorage {
 		tx(session -> {
 			session.delete(brand);
 			return true;
-		});
+		}, "Can't delete brand =" + brand.toString());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Brand> getAll() {
-		return tx(session -> session.createQuery("from Brand b order by b.name").list());
+		return tx(session -> session.createQuery("from Brand b order by b.name").list(),
+				"Can't get brands");
 	}
 
 	@Override
@@ -91,7 +94,7 @@ public class BrandStorage implements IBrandStorage {
 	    return result;
 	}
 
-	private <T> T tx(final Function<Session, T> command) {
+	private <T> T tx(final Function<Session, T> command, String msg) {
 	    final Session session = factory.openSession();
 	    final Transaction tx = session.beginTransaction();
 	    try {
@@ -100,7 +103,7 @@ public class BrandStorage implements IBrandStorage {
 	        return rsl;
 	    } catch (final Exception e) {
 	        session.getTransaction().rollback();
-	        LOG.error(e);
+	        LOG.error(msg, e);
 	    } finally {
 	        session.close();
 	    }
